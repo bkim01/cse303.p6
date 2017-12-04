@@ -201,8 +201,17 @@ void get_file(int fd, char *get_name, char *save_name)
 	char sendstr[512];
 	//printf("buffer is %s\n", buffer);
 	n = sprintf(sendstr, "GET <%s>\n", get_name);
-
 	send(fd, sendstr, n, 0);
+
+	char recv_str[512];
+	int rcvd_bytes;
+	rcvd_bytes = recv(fd, recv_str, 512, 0);
+
+	printf("client received string %s\n", recv_str);
+	// ofstream myfile;
+	// myfile.open(save_name);
+	// myfile << recStrBuf;
+	// myfile.close();
 }
 
 /*

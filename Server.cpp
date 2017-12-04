@@ -201,26 +201,39 @@ void file_server(int connfd, int lru_size)
 
 	char * pch;
 	pch = strtok(recv_str, "<");
+	pch = strtok(NULL, "<");
 	strcpy(filename, pch);
+	filename[strlen(filename) - 2] = '\0';
 	pch = strtok(NULL, "<");
 	filesize = atoi(pch);
 	pch = strtok(NULL, "<");
 	strcpy(recStrBuf, pch);
+	recStrBuf[strlen(recStrBuf) - 2] = '\0';
 
-	printf("HERE %s %d %s", filename, filesize, recStrBuf);
+	//printf("HERE filename:%s filesize:%d buffer:%s", filename, filesize, recStrBuf);
 
-	// if((strcmp(recv_str[0]), 'P') == 0){
-	// 	ofstream myfile;
-	// 	//myfile.open("")
-  //
-	// }
-	// //Get request
-	// else if((strcmp(recv_str[0]), 'G') == 0){
-  //
-	// }
-	// else{
-	// 	printf("error\n");
-	// }
+	if((recv_str[0]) == 'P'){
+		ofstream myfile;
+		myfile.open(filename);
+		myfile << recStrBuf;
+		myfile.close();
+	}
+	//Get request
+	else if(recv_str[0] == 'G'){
+		FILE *fp;
+		fp = fopen(filename, "r");
+		char * buffer = (char *)malloc(sizeof(char) * 512);
+
+		int bytes_read = fread(buffer, sizeof(char), 512, fp);
+		int n;
+		char sendstr[512];
+		n = sprintf(sendstr, "OK <%s>\n<%d>\n<%s>\n", filename, bytes_read, buffer);
+		send(fd, sendstr, n, 0);
+		close(fp);
+	}
+	else{
+		printf("error\n");
+	}
 }
 
 /*
