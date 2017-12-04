@@ -15,7 +15,10 @@
 #include <unistd.h>
 #include "support.h"
 #include "Server.h"
+#include <fstream>
+#include <iostream>
 
+using namespace std;
 
 void help(char *progname)
 {
@@ -130,62 +133,94 @@ void file_server(int connfd, int lru_size)
 
 	/* sample code: continually read lines from the client, and send them
 	   back to the client immediately */
-	while(1)
-	{
-		const int MAXLINE = 8192;
-		char      buf[MAXLINE];   /* a place to store text from the client */
-		bzero(buf, MAXLINE);
-
-		/* read from socket, recognizing that we may get short counts */
-		char *bufp = buf;              /* current pointer into buffer */
-		ssize_t nremain = MAXLINE;     /* max characters we can still read */
-		size_t nsofar;                 /* characters read so far */
-		while (1)
-		{
-			/* read some data; swallow EINTRs */
-			if((nsofar = read(connfd, bufp, nremain)) < 0)
-			{
-				if(errno != EINTR)
-				{
-					die("read error: ", strerror(errno));
-				}
-				continue;
-			}
-			/* end service to this client on EOF */
-			if(nsofar == 0)
-			{
-				fprintf(stderr, "received EOF\n");
-				return;
-			}
-			/* update pointer for next bit of reading */
-			bufp += nsofar;
-			nremain -= nsofar;
-			if(*(bufp-1) == '\n')
-			{
-				*bufp = 0;
-				break;
-			}
-		}
+	// while(1)
+	// {
+	// 	const int MAXLINE = 8192;
+	// 	char      buf[MAXLINE];   /* a place to store text from the client */
+	// 	bzero(buf, MAXLINE);
+  //
+	// 	/* read from socket, recognizing that we may get short counts */
+	// 	char *bufp = buf;              /* current pointer into buffer */
+	// 	ssize_t nremain = MAXLINE;     /* max characters we can still read */
+	// 	size_t nsofar;                 /* characters read so far */
+	// 	while (1)
+	// 	{
+	// 		/* read some data; swallow EINTRs */
+	// 		if((nsofar = read(connfd, bufp, nremain)) < 0)
+	// 		{
+	// 			if(errno != EINTR)
+	// 			{
+	// 				die("read error: ", strerror(errno));
+	// 			}
+	// 			continue;
+	// 		}
+	// 		/* end service to this client on EOF */
+	// 		if(nsofar == 0)
+	// 		{
+	// 			fprintf(stderr, "received EOF\n");
+	// 			return;
+	// 		}
+	// 		/* update pointer for next bit of reading */
+	// 		bufp += nsofar;
+	// 		nremain -= nsofar;
+	// 		if(*(bufp-1) == '\n')
+	// 		{
+	// 			*bufp = 0;
+	// 			break;
+	// 		}
+	// 	}
 
 		/* dump content back to client (again, must handle short counts) */
-		printf("server received %d bytes\n", MAXLINE-nremain);
-		nremain = bufp - buf;
-		bufp = buf;
-		while(nremain > 0)
-		{
-			/* write some data; swallow EINTRs */
-			if((nsofar = write(connfd, bufp, nremain)) <= 0)
-			{
-				if(errno != EINTR)
-				{
-					die("Write error: ", strerror(errno));
-				}
-				nsofar = 0;
-			}
-			nremain -= nsofar;
-			bufp += nsofar;
-		}
-	}
+	// 	printf("server received %d bytes\n", MAXLINE-nremain);
+	// 	nremain = bufp - buf;
+	// 	bufp = buf;
+	// 	while(nremain > 0)
+	// 	{
+	// 		/* write some data; swallow EINTRs */
+	// 		if((nsofar = write(connfd, bufp, nremain)) <= 0)
+	// 		{
+	// 			if(errno != EINTR)
+	// 			{
+	// 				die("Write error: ", strerror(errno));
+	// 			}
+	// 			nsofar = 0;
+	// 		}
+	// 		nremain -= nsofar;
+	// 		bufp += nsofar;
+	// 	}
+	// }
+	char recv_str[512];
+	int rcvd_bytes;
+	rcvd_bytes = recv(connfd, recv_str, 512, 0);
+	printf("Server received: %s (%d bytes)\n", recv_str, rcvd_bytes);
+	//printf("received string %s\n", recv_str);
+	//put request
+	char* filename = (char *)malloc(512 * sizeof(char));
+	int filesize;
+	char * recStrBuf = (char *)malloc(512 * sizeof(char));
+
+	char * pch;
+	pch = strtok(recv_str, "<");
+	strcpy(filename, pch);
+	pch = strtok(NULL, "<");
+	filesize = atoi(pch);
+	pch = strtok(NULL, "<");
+	strcpy(recStrBuf, pch);
+
+	printf("HERE %s %d %s", filename, filesize, recStrBuf);
+
+	// if((strcmp(recv_str[0]), 'P') == 0){
+	// 	ofstream myfile;
+	// 	//myfile.open("")
+  //
+	// }
+	// //Get request
+	// else if((strcmp(recv_str[0]), 'G') == 0){
+  //
+	// }
+	// else{
+	// 	printf("error\n");
+	// }
 }
 
 /*

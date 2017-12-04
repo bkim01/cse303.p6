@@ -21,6 +21,9 @@
 #include <unistd.h>
 #include "support.h"
 #include "Client.h"
+#include <iostream>
+
+using namespace std;
 
 void help(char *progname)
 {
@@ -157,7 +160,27 @@ void echo_client(int fd)
 void put_file(int fd, char *put_name)
 {
 	/* TODO: implement a proper solution, instead of calling the echo() client */
-	echo_client(fd);
+	//echo_client(fd);
+	FILE *fp;
+	fp = fopen(put_name, "r");
+
+	// int filedesc;
+	// filedesc = fileno(fp);
+
+	char * buffer = (char *)malloc(sizeof(char) * 512);
+
+	int bytes_read = fread(buffer, sizeof(char), 512, fp);
+
+	 //cout << bytes_read << endl;
+	 //cout << buffer << endl;
+
+	int n;
+	char sendstr[512];
+	//printf("buffer is %s\n", buffer);
+	n = sprintf(sendstr, "PUT <%s>\n<%d>\n<%s>\n", put_name, bytes_read, buffer);
+
+	send(fd, sendstr, n, 0);
+
 }
 
 /*
@@ -167,7 +190,19 @@ void put_file(int fd, char *put_name)
 void get_file(int fd, char *get_name, char *save_name)
 {
 	/* TODO: implement a proper solution, instead of calling the echo() client */
-	echo_client(fd);
+	//echo_client(fd);
+
+	// int filedesc;
+	// filedesc = fileno(fp);
+
+	char * buffer = (char *)malloc(sizeof(char) * 512);
+
+	int n;
+	char sendstr[512];
+	//printf("buffer is %s\n", buffer);
+	n = sprintf(sendstr, "GET <%s>\n", get_name);
+
+	send(fd, sendstr, n, 0);
 }
 
 /*
