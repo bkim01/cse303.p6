@@ -225,7 +225,7 @@ void file_server(int connfd, int lru_size)
 		pch = strtok(recv_str, "<");
 		pch = strtok(NULL, "<");
 		strcpy(filename, pch);
-		filename[strlen(filename) - 1] = '\0';
+		filename[strlen(filename) - 2] = '\0';
 
 		printf("filename is %s\n", filename);
 		FILE *fp;

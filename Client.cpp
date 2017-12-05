@@ -22,6 +22,7 @@
 #include "support.h"
 #include "Client.h"
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -207,8 +208,26 @@ void get_file(int fd, char *get_name, char *save_name)
 	int rcvd_bytes;
 	rcvd_bytes = recv(fd, recv_str, 512, 0);
 
-	//printf("client received string %s\n", recv_str);
-	 ofstream myfile;
+	 printf("client received string %s\n", recv_str);
+	 printf("parsing string\n");
+
+   char* filename = (char *)malloc(512 * sizeof(char));
+   	int filesize;
+	//printf("before received string");
+	char* recStrBuf = (char *)malloc(512 * sizeof(char));
+   char * pch;
+   pch = strtok(recv_str, "<");
+   pch = strtok(NULL, "<");
+
+   strcpy(filename, pch);
+   filename[strlen(filename) - 2] = '\0';
+   pch = strtok(NULL, "<");
+   filesize = atoi(pch);
+   pch = strtok(NULL, "<");
+   strcpy(recStrBuf, pch);
+   recStrBuf[strlen(recStrBuf) - 2] = '\0';
+   printf("HERE filename:%s filesize:%d buffer:%s", filename, filesize, recStrBuf);
+   std::ofstream myfile;
 	 myfile.open(save_name);
 	 myfile << recStrBuf;
 	 myfile.close();
