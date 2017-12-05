@@ -193,26 +193,26 @@ void file_server(int connfd, int lru_size)
 	int rcvd_bytes;
 	rcvd_bytes = recv(connfd, recv_str, 512, 0);
 	printf("Server received: %s (%d bytes)\n", recv_str, rcvd_bytes);
-	//printf("received string %s\n", recv_str);
 	//put request
 	char* filename = (char *)malloc(512 * sizeof(char));
 	int filesize;
-	char * recStrBuf = (char *)malloc(512 * sizeof(char));
-
-	char * pch;
-	pch = strtok(recv_str, "<");
-	pch = strtok(NULL, "<");
-	strcpy(filename, pch);
-	filename[strlen(filename) - 2] = '\0';
-	pch = strtok(NULL, "<");
-	filesize = atoi(pch);
-	pch = strtok(NULL, "<");
-	strcpy(recStrBuf, pch);
-	recStrBuf[strlen(recStrBuf) - 2] = '\0';
-
-	//printf("HERE filename:%s filesize:%d buffer:%s", filename, filesize, recStrBuf);
+	//printf("before received string");
+	char* recStrBuf = (char *)malloc(512 * sizeof(char));
+	//printf("after received string");
 
 	if((recv_str[0]) == 'P'){
+		char * pch;
+		pch = strtok(recv_str, "<");
+		pch = strtok(NULL, "<");
+		strcpy(filename, pch);
+		filename[strlen(filename) - 2] = '\0';
+		pch = strtok(NULL, "<");
+		filesize = atoi(pch);
+		pch = strtok(NULL, "<");
+		strcpy(recStrBuf, pch);
+		recStrBuf[strlen(recStrBuf) - 2] = '\0';
+
+		printf("HERE filename:%s filesize:%d buffer:%s", filename, filesize, recStrBuf);
 		ofstream myfile;
 		myfile.open(filename);
 		myfile << recStrBuf;
@@ -220,16 +220,26 @@ void file_server(int connfd, int lru_size)
 	}
 	//Get request
 	else if(recv_str[0] == 'G'){
+		printf("made it into get request \n");
+		char * pch;
+		pch = strtok(recv_str, "<");
+		pch = strtok(NULL, "<");
+		strcpy(filename, pch);
+		filename[strlen(filename) - 1] = '\0';
+
+		printf("filename is %s\n", filename);
 		FILE *fp;
 		fp = fopen(filename, "r");
 		char * buffer = (char *)malloc(sizeof(char) * 512);
 
 		int bytes_read = fread(buffer, sizeof(char), 512, fp);
+
+		printf("buffer from read is %s\n", buffer);
 		int n;
 		char sendstr[512];
 		n = sprintf(sendstr, "OK <%s>\n<%d>\n<%s>\n", filename, bytes_read, buffer);
-		send(fd, sendstr, n, 0);
-		close(fp);
+		send(connfd, sendstr, n, 0);
+		fclose(fp);
 	}
 	else{
 		printf("error\n");
