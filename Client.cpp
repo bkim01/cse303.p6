@@ -317,14 +317,14 @@ void put_file(int fd, char *put_name, int checkSum)
 
 
 	fclose(putf);
-	printf("client put buffer is :'%s'\n", buffer);
+	//printf("client put buffer is :'%s'\n", buffer);
 	if(checkSum == 1) {
 		//unsigned char sum[256];
 		//bzero(sum, 256);
 		unsigned char * sum = (unsigned char *)malloc(sizeof(char) * size);
 		//Print before and after calculating the checksum
-		printf("The file buffer before the checksum is '%s'\n", buffer);
-		printf("in checksum bytes is : %d\n", size);
+		//printf("The file buffer before the checksum is '%s'\n", buffer);
+		//printf("in checksum bytes is : %d\n", size);
 
 		//cout << "md5 of abc" << MD5("abc") << endl
 
@@ -336,8 +336,8 @@ void put_file(int fd, char *put_name, int checkSum)
 			sprintf(&mdString[i*2], "%02x", (unsigned int)sum[i]);
 		}
 
-		printf("md5 digest: %s\n", mdString);
-		sprintf(strArr, "%s\n<%s>\n<%lu bytes>\n<%s>\n<%s>%s", "PUTC", put_name, size ,mdString, buffer, stop);
+		//printf("md5 digest: %s\n", mdString);
+		sprintf(strArr, "%s\n<%s>\n<%lu bytes>\n<%s>\n<%s>\n%s", "PUTC", put_name, size ,mdString, buffer, stop);
 	}
 	//Otherise no checksum is wanted here
 	else {
@@ -349,11 +349,11 @@ void put_file(int fd, char *put_name, int checkSum)
 			sprintf(strArr, "%s\n<%s>\n<%lu bytes>\n<%s>%s", "PUT", put_name, e_size, encrypted, stop);
 		}
 		else {
-			sprintf(strArr, "%s\n<%s>\n<%lu bytes>\n<%s>%s", "PUT", put_name, size, buffer, stop);
+			sprintf(strArr, "%s\n<%s>\n<%lu bytes>\n<%s>\n%s", "PUT", put_name, size, buffer, stop);
 		}
 	}
 
-	printf("Client sends:\n%s\n", strArr);
+	//printf("Client sends:\n%s\n", strArr);
 	//sprintf(strArr, "%s\n%s\n%ul\n%s\n$", "PUT", put_name, size, tempArr);
 	size_t n = strlen(strArr);
 	size_t nremain = n;
@@ -401,7 +401,7 @@ void put_file(int fd, char *put_name, int checkSum)
 
 	bzero((bufpnew - strlen(stop)), strlen(stop));
 	//Print the buffer at the end
-	printf("bufnew: \n%s\n", bufnew);
+	printf("%s", bufnew);
 	return;
 }
 
@@ -414,11 +414,11 @@ void get_file(int fd, char *get_name, char *save_name, int checkSum)
 	char strArr[8192];
 	if(checkSum == 1){
 		sprintf(strArr, "%s <%s>\n%s", "GETC", get_name, stop);
-		printf("client sends get request:\n%s\n", strArr);
+		//printf("client sends get request:\n%s\n", strArr);
 	}
 	else{
 		sprintf(strArr, "%s <%s>\n%s", "GET", get_name, stop);
-		printf("client sends get request:\n%s\n", strArr);
+		//printf("client sends get request:\n%s\n", strArr);
 	}
 	size_t n = strlen(strArr);
 	size_t nremainnew = n;
@@ -454,7 +454,7 @@ void get_file(int fd, char *get_name, char *save_name, int checkSum)
 			continue;
 		}
 
-		printf("nosofar: \n%d\n", nsofar);
+		//printf("nosofar: \n%d\n", nsofar);
 
 		if (nsofar == 0) {
 			break;
@@ -468,7 +468,7 @@ void get_file(int fd, char *get_name, char *save_name, int checkSum)
 		}
 	}
 	//Print the current buffer of the file
-	printf("current buffer '%s'\n", buf);
+	printf("%s\n", buf);
 	bzero((bufp - strlen(stop)), strlen(stop));
 	//printf("contents of bufp: %s\ncontents of buf: %s", bufp, buf);
 	char command[15][MAXLINE];
@@ -550,10 +550,10 @@ void get_file(int fd, char *get_name, char *save_name, int checkSum)
 		}
 	}
 
-	printf("filename is: '%s'\n", filename);
-	printf("byteSize is: '%s'\n", byteSize);
-	printf("cSum is: '%s'\n", cSum);
-	printf("file contents is: '%s'\n", fcontent);
+	// printf("filename is: '%s'\n", filename);
+	// printf("byteSize is: '%s'\n", byteSize);
+	// printf("cSum is: '%s'\n", cSum);
+	// printf("file contents is: '%s'\n", fcontent);
 
 
 	int done = 0;
@@ -583,7 +583,7 @@ void get_file(int fd, char *get_name, char *save_name, int checkSum)
 	unsigned char decrypted[8000];
 	if(encryptFile == 1) {
 		//printf("not here\n");
-		printf("buffer :%s\nsize:%d\n", fcontent, sizeCount);
+		//printf("buffer :%s\nsize:%d\n", fcontent, sizeCount);
 		e_size = RSAEncrypt(fcontent, sizeCount, (char *)decrypted, 1);
 
 	}
@@ -596,7 +596,7 @@ void get_file(int fd, char *get_name, char *save_name, int checkSum)
 			//printf("size is %d\n", size);
 			unsigned char * sum = (unsigned char *)malloc(sizeof(char) * size);
 			//Print before and after calculating the checksum
-			printf("fcontent is '%s' size is '%d'\n", fcontent, size);
+			//printf("fcontent is '%s' size is '%d'\n", fcontent, size);
 			MD5((unsigned char *)fcontent, size, sum);
 			//printf("The checksummed file buffer is %s\nThe checksum is %02x\n", buffer, sum);
 			char mdString[33];
@@ -604,7 +604,7 @@ void get_file(int fd, char *get_name, char *save_name, int checkSum)
 			for(int i = 0; i < 16; i++){
 				sprintf(&mdString[i*2], "%02x", (unsigned int)sum[i]);
 			}
-			printf("mdString is : %s\n", mdString);
+			//printf("mdString is : %s\n", mdString);
 			if(!strcmp(mdString, cSum)){
 				validCSum = 1;
 			}
@@ -615,7 +615,7 @@ void get_file(int fd, char *get_name, char *save_name, int checkSum)
 
 		if(validCSum || !checkSum){
 			FILE* getf;
-			printf("save_name is:\n%s\n", save_name);
+			//printf("save_name is:\n%s\n", save_name);
 			if((getf = fopen(save_name, "w")) != NULL) {
 				int j = 0;
 				//If the file is encrypted, decrypt it and show the contents
@@ -628,7 +628,7 @@ void get_file(int fd, char *get_name, char *save_name, int checkSum)
 				}
 				else {
 					//Print out the file contents
-					printf("i am doing that ofstream stuff\n");
+					//printf("i am doing that ofstream stuff\n");
 					std::ofstream myfile;
 					myfile.open(save_name);
 					myfile << fcontent;

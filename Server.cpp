@@ -162,7 +162,8 @@ void initialize_lru(int size) {
 *                 then close the connection.
 */
 //Character to stop the transmission
-char* stop = "$";
+char st[1] = {'$'};
+char * stop = st;
 
 //Get the name of the file that is requested from the client
 int getName(char* fil, struct getput* req) {
@@ -191,7 +192,7 @@ int getName(char* fil, struct getput* req) {
 	if(exists == 1) {
 		fil[length - 1] = '\n';
 	}
-	printf("fil when we send carrot %s\n", fil);
+	//printf("fil when we send carrot %s\n", fil);
 
 	//Return 1 if the file is found by the server
 	return 1;
@@ -200,7 +201,7 @@ int getName(char* fil, struct getput* req) {
 //Get the type of command that is requested (PUT or GET)
 int getType(char* command, struct getput* req) {
 	//Check to see whether the command given is a PUT or a GET
-	printf("inside getType command is %s\n", command);
+	//printf("inside getType command is %s\n", command);
 
 	//Check whether the command given is a PUTC or a GETC (a PUT/GET with a
 	//checksum
@@ -317,7 +318,7 @@ void addCache(struct lru_cache* cachedFile) {
 		lru[size_cache] = cachedFile;
 		//Increment the size counter
 		size_cache++;
-		printf("%s was added to the cache at spot %i\n", lru[size_cache - 1]->name, size_cache);
+		//printf("%s was added to the cache at spot %i\n", lru[size_cache - 1]->name, size_cache);
 	}
 	//If no more space, remove the first file in the cache
 	else {
@@ -341,7 +342,7 @@ void clientResponse(int connfd, char* result) {
 	//Print the resuls and the terminating character in the array buffer
 	sprintf(arr, "%s%s", result, stop);
 	while(nremain > 0) {
-		printf("printing result from clientResponse:\n%s\n", arr);
+		//printf("printing result from clientResponse:\n%s\n", arr);
 		if((nsofar = write(connfd, result, nremain)) <= 0) {
 			if(errno != EINTR) {
 				die("Write error: ", strerror(errno));
@@ -384,7 +385,7 @@ int create(int connfd, struct getput* req, char* contents, int nsofar) {
 	}
 	// contents = contents + 1;
 	// contents[strlen(contents) - 2] = '\0';
-	printf("Contents of file: \n%s\n", contents);
+	//printf("Contents of file: \n%s\n", contents);
 	FILE* putf = NULL;
 	//Open the put file
 	putf = fopen(req->filename, "w");
@@ -415,13 +416,13 @@ int checkSum(char* checksum, struct getput* req, char* contents, char * ret) {
 	unsigned char * sum = (unsigned char *)malloc(sizeof(char) * req->bytes);
 	//Calculate the sum using this buffer
 
-	printf("client given checksum is %s\n", checksum);
-	printf("The file buffer before the checksum is \n'%s'", contents);
+	//printf("client given checksum is %s\n", checksum);
+	//printf("The file buffer before the checksum is \n'%s'", contents);
 
 	//Run the MD5 algorithm on the checksum
-	printf("fcontent is '%s' size is '%d'\n", contents, req->bytes);
+	//printf("fcontent is '%s' size is '%d'\n", contents, req->bytes);
 
-	printf("in checksum bytes is : %d\n", req->bytes);
+	//printf("in checksum bytes is : %d\n", req->bytes);
 	MD5((unsigned char *)contents, req->bytes, sum);
 	//sprintf(arr, "%x", sum);
 	//MD5((unsigned char *)buffer, size, sum);
@@ -439,7 +440,7 @@ int checkSum(char* checksum, struct getput* req, char* contents, char * ret) {
 	}
 
 	if(!strcmp(mdString, checksum)) {
-		printf("The checksum is %s", mdString);
+		//printf("The checksum is %s", mdString);
 		return 1;
 	}
 	//If the check sum does not agree
@@ -495,7 +496,7 @@ void file_server(int connfd, int lru_size) {
 				break;
 			}
 		}
-		printf("buf in server is :\n%s\n", buf);
+		printf("%s", buf);
 		bzero((bufp - strlen(stop)), strlen(stop));
 		//Inrementers usedF for the commands to iterate through them
 		int commandv_i = 0;
@@ -553,11 +554,11 @@ void file_server(int connfd, int lru_size) {
 		}
 		//
 
-		printf("what is command[1] \n%s\n", command[0]);
-		printf("what is req->checkSum %d\n", req->checkSum);
+		//printf("what is command[1] \n%s\n", command[0]);
+		//printf("what is req->checkSum %d\n", req->checkSum);
 		if(req->type == 1){
 			if(req->checkSum == 1){
-				printf("here\n");
+				//printf("here\n");
 				char * getfilename = command[0];
 				getfilename = getfilename + 5;
 				found = getName(getfilename, req);
@@ -575,7 +576,7 @@ void file_server(int connfd, int lru_size) {
 			*bufp = 0;
 		}
 		//If it is a PUT request
-		printf("what is req->type %d\n", req->type);
+		//printf("what is req->type %d\n", req->type);
 		if(req->type == 2) {
 			char bcarrot = '<';
 			char ecarrot = '>';
@@ -588,7 +589,7 @@ void file_server(int connfd, int lru_size) {
 			int putcCheck = 0;
 
 			bufp = buf;
-			printf("buffer here :\n%s\n", bufp);
+			//printf("buffer here :\n%s\n", bufp);
 
 			token = strchr(buf, bcarrot);
 
@@ -644,10 +645,10 @@ void file_server(int connfd, int lru_size) {
 			}
 
 
-			printf("client filename is: '%s'\n", filename);
-			printf("client byteSize is: '%s'\n", byteSize);
-			printf("client file contents is: '%s'\n", fcontent);
-			printf("client checkSum is: '%s'\n", cSum);
+			// printf("client filename is: '%s'\n", filename);
+			// printf("client byteSize is: '%s'\n", byteSize);
+			// printf("client file contents is: '%s'\n", fcontent);
+			// printf("client checkSum is: '%s'\n", cSum);
 
 			int shouldWrite = 0;
 			if(req->checkSum == 1) {
@@ -655,12 +656,12 @@ void file_server(int connfd, int lru_size) {
 				sscanf(byteSize, "%d", &size);
 				req->bytes = size;
 				if(checkSum(cSum, req, fcontent, NULL)) {
-					clientResponse(connfd, "OKC\n");
+					clientResponse(connfd, (char *)"OKC\n");
 					shouldWrite = 1;
 				}
 			}
 			else {
-				clientResponse(connfd, "OK\n");
+				clientResponse(connfd, (char *)"OK\n");
 				shouldWrite = 1;
 			}
 			if(shouldWrite){
@@ -675,22 +676,23 @@ void file_server(int connfd, int lru_size) {
 			continue;
 		}
 		else {
-			printf("inside get if statement\n");
+			//printf("inside get if statement\n");
 			FILE* getf;
 			char c = 'a';
 			int i = 0;
 			int size = 0;
-			printf("filename is '%s'\n", req->filename);
+			//printf("filename is '%s'\n", req->filename);
 			getf = fopen(req->filename, "r");
 			if(getf != NULL) {
 				// while((c = fgetc(getf)) != EOF) {
 				// 	size++;
 				// }
-				unsigned char * buffer = (unsigned char *)malloc(2048 * sizeof(unsigned char));
-				int bytes_read = fread(buffer, sizeof(unsigned char), 2048, getf);
-
+				char * buffer = (char *)malloc(2048 * sizeof(char));
+				int bytes_read = fread(buffer, sizeof(char), 2048, getf);
+				//printf("in server get if statement, size is %d\n", bytes_read);
 				req->bytes = bytes_read;
 				//Close the file
+				size = bytes_read;
 				fclose(getf);
 				fileContents = (char *)malloc(sizeof(char) * size);
 				getf = fopen(req->filename, "r");
@@ -707,7 +709,7 @@ void file_server(int connfd, int lru_size) {
 				if(!getArr) {
 					getArr = (struct lru_cache*)malloc(sizeof(struct lru_cache));
 					getArr->name = strdup(req->filename);
-					getArr->contents = strdup(fileContents);
+					getArr->contents = strdup((const char *)buffer);
 					getArr->lru_size = req->bytes;
 					addCache(getArr);
 				}
